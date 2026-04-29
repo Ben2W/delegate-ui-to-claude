@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delegate UI To Claude"
+  short_description: "Route UI changes through Claude Code"
+  default_prompt: "Use $delegate-ui-to-claude to make this frontend UI change through Claude Code headlessly."
