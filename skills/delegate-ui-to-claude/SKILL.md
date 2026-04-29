@@ -25,6 +25,7 @@ Route UI/frontend work through Claude Code using a non-interactive `claude --pri
 
 ```bash
 script_path="${CODEX_HOME:-$HOME/.codex}/skills/delegate-ui-to-claude/scripts/delegate-ui-to-claude.sh"
+[ -x "$script_path" ] || script_path="$HOME/.agents/skills/delegate-ui-to-claude/scripts/delegate-ui-to-claude.sh"
 [ -x "$script_path" ] || script_path=".agents/skills/delegate-ui-to-claude/scripts/delegate-ui-to-claude.sh"
 
 "$script_path" <<'TASK'
