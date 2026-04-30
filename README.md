@@ -1,6 +1,6 @@
 # delegate-ui-to-claude
 
-Agent skill that makes Codex delegate UI/frontend changes to Claude Code in headless mode.
+Agent skill that lets Codex implement frontend code, then asks Claude Code to run a headless design rewrite/refinement pass.
 
 Install with:
 

@@ -4,8 +4,8 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  delegate-ui-to-claude.sh "UI task"
-  delegate-ui-to-claude.sh < task.md
+  delegate-ui-to-claude.sh "Design refinement task"
+  delegate-ui-to-claude.sh < design-task.md
 
 Environment:
   CLAUDE_UI_REPO             Repository path. Defaults to current directory.
@@ -56,7 +56,7 @@ claude --print \
   --add-dir "$repo" \
   -- \
   "$(cat <<PROMPT
-You are Claude Code running headlessly for a UI/frontend task delegated by Codex.
+You are Claude Code running headlessly as a frontend design refinement pass after Codex has implemented or scaffolded the functional UI.
 
 Apply the following embedded frontend-design skill instructions directly. Do not try to load a slash command or external skill; the complete design guidance is already included here.
 
@@ -70,9 +70,11 @@ Task:
 $task
 
 Requirements:
-- Make the requested UI/frontend changes directly in the repository.
-- Preserve existing architecture, framework conventions, and design system patterns.
+- Rewrite/refine the existing frontend design directly in the repository.
+- Preserve existing behavior, data flow, framework conventions, public APIs, routes, and accessibility semantics unless a design change requires a clearly beneficial accessibility improvement.
+- Improve visual hierarchy, typography, spacing, color, motion, layout, responsiveness, and interaction polish.
 - Keep user-facing UI polished, responsive, accessible, and consistent with the product domain.
+- Do not take over unrelated functional implementation. If required UI files or a functional baseline are missing, report that Codex should scaffold/implement them first instead of building a full app from scratch.
 - Use visual verification when project tooling supports it.
 - Run relevant checks when practical.
 - Do not commit changes unless the user explicitly requested a commit.
