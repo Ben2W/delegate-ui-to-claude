@@ -5,7 +5,7 @@ Agent skill that makes Codex delegate UI/frontend changes to Claude Code in head
 Install with:
 
 ```bash
-npx skills add Ben2W/mcpForClaudeCodeFrontend --skill delegate-ui-to-claude --agent codex --global --yes
+npx skills add Ben2W/delegate-ui-to-claude --skill delegate-ui-to-claude --agent codex --global --yes
 ```
 
-The skill expects the `claude` CLI to be available and asks Claude Code to use `$frontend-design` when available, falling back to `$web-design-guidelines`.
+The skill expects the `claude` CLI to be available. It embeds the `frontend-design` instructions directly into the prompt sent to Claude Code, so Claude does not need a separate design skill installed.

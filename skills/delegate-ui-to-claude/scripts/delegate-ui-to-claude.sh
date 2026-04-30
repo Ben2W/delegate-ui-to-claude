@@ -9,8 +9,6 @@ Usage:
 
 Environment:
   CLAUDE_UI_REPO             Repository path. Defaults to current directory.
-  CLAUDE_UI_SKILL            Preferred Claude design skill. Defaults to frontend-design.
-  CLAUDE_UI_FALLBACK_SKILL   Fallback skill. Defaults to web-design-guidelines.
   CLAUDE_UI_PERMISSION_MODE  Claude permission mode. Defaults to acceptEdits.
   CLAUDE_UI_OUTPUT_FORMAT    Claude output format. Defaults to text.
 EOF
@@ -27,10 +25,15 @@ if ! command -v claude >/dev/null 2>&1; then
 fi
 
 repo="${CLAUDE_UI_REPO:-$PWD}"
-skill="${CLAUDE_UI_SKILL:-frontend-design}"
-fallback_skill="${CLAUDE_UI_FALLBACK_SKILL:-web-design-guidelines}"
 permission_mode="${CLAUDE_UI_PERMISSION_MODE:-acceptEdits}"
 output_format="${CLAUDE_UI_OUTPUT_FORMAT:-text}"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+frontend_design_file="$script_dir/../references/frontend-design.md"
+
+if [[ ! -f "$frontend_design_file" ]]; then
+  echo "error: bundled frontend design instructions not found: $frontend_design_file" >&2
+  exit 66
+fi
 
 if [[ $# -gt 0 ]]; then
   task="$*"
@@ -45,6 +48,7 @@ if [[ -z "${task//[[:space:]]/}" ]]; then
 fi
 
 cd "$repo"
+frontend_design_instructions="$(cat "$frontend_design_file")"
 
 claude --print \
   --permission-mode "$permission_mode" \
@@ -53,7 +57,11 @@ claude --print \
   "$(cat <<PROMPT
 You are Claude Code running headlessly for a UI/frontend task delegated by Codex.
 
-Use \$$skill if it exists. If that skill is unavailable, use \$$fallback_skill. If neither skill is available, continue by applying equivalent high-quality frontend design standards directly and mention that the named skill was unavailable.
+Apply the following embedded frontend-design skill instructions directly. Do not try to load a slash command or external skill; the complete design guidance is already included here.
+
+<frontend-design>
+$frontend_design_instructions
+</frontend-design>
 
 Repository: $repo
 
