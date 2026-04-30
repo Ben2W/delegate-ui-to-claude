@@ -54,6 +54,7 @@ claude --print \
   --permission-mode "$permission_mode" \
   --output-format "$output_format" \
   --add-dir "$repo" \
+  -- \
   "$(cat <<PROMPT
 You are Claude Code running headlessly for a UI/frontend task delegated by Codex.
 

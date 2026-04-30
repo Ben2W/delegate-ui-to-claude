@@ -49,6 +49,7 @@ claude --print \
   --permission-mode acceptEdits \
   --output-format text \
   --add-dir "$PWD" \
+  -- \
   'You are Claude Code running headlessly for a UI/frontend task delegated by Codex.
 
 Apply these frontend-design instructions directly:
@@ -57,6 +58,8 @@ Apply these frontend-design instructions directly:
 
 Make the requested UI/frontend changes directly in this repository. Preserve existing framework and design-system conventions, run relevant checks when practical, and do not commit changes unless explicitly requested.'
 ```
+
+The `--` separator is required. In current Claude Code CLI versions, `--add-dir` accepts multiple directory values and can otherwise consume the prompt as another directory.
 
 Use `CLAUDE_UI_PERMISSION_MODE=bypassPermissions` only when the user explicitly requests fully autonomous execution in a trusted workspace. Default to `acceptEdits`.
 
