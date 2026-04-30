@@ -9,6 +9,8 @@ description: Use Claude Code as a headless frontend design refinement pass after
 
 Let Codex build the frontend functionality, structure, data wiring, and initial UI code. Then route the result through Claude Code using a non-interactive `claude --print` invocation so Claude performs a design rewrite/refinement pass with this skill's bundled `references/frontend-design.md`.
 
+The wrapper can opportunistically give Claude a local preview URL. A preview URL is helpful but never required: if no URL is available and no obvious dev server can be started, the wrapper continues with source-level refinement and build/static checks.
+
 ## Required Behavior
 
 - Codex may scaffold, implement, and modify frontend code directly, including components, routes, state, data fetching, accessibility semantics, tests, and build wiring.
@@ -17,6 +19,7 @@ Let Codex build the frontend functionality, structure, data wiring, and initial 
 - Do not ask Claude Code to load `$frontend-design`, `$web-design-guidelines`, or any other external design skill. The frontend design instructions are bundled with this skill and must be included directly in Claude's prompt.
 - If Claude Code is unavailable, stop and report the blocker unless the user explicitly authorizes Codex to do the UI implementation directly.
 - After Claude finishes, inspect the diff yourself. Codex may make functional fixes, integration fixes, and small cleanup edits. If the result still needs meaningful visual/design changes, delegate another design pass to Claude Code.
+- The wrapper defaults to `--output-format stream-json` with partial messages and emits heartbeat status while Claude runs, so long design passes do not appear stalled.
 
 ## Workflow
 
@@ -37,6 +40,15 @@ Include expected verification commands when known.
 TASK
 ```
 
+Preview URL behavior:
+
+- If `CLAUDE_UI_URL` is set and reachable, the wrapper passes it to Claude.
+- If no URL is provided, `CLAUDE_UI_START_SERVER=auto` tries to start an obvious package `dev` script and passes the detected local URL only if it becomes reachable.
+- If no preview URL is available, the wrapper continues and explicitly tells Claude not to block on browser verification.
+- Set `CLAUDE_UI_START_SERVER=never` to skip server probing, or `CLAUDE_UI_START_SERVER=always` to fail when no preview server can be started.
+- Set `CLAUDE_UI_DEV_CMD` for custom server startup. It may include `{host}`, `{port}`, and `{url}` placeholders, for example: `CLAUDE_UI_DEV_CMD='npm run dev -- --host {host} --port {port}'`.
+- Set `CLAUDE_UI_HEARTBEAT_SECONDS=0` to disable wrapper heartbeat output.
+
 5. Review Claude's output and the local diff with `git diff --stat` and targeted file reads.
 6. Run the relevant checks yourself when practical: lint, typecheck, tests, build, and visual verification for significant UI work.
 7. If the UI needs design revision, delegate the follow-up back to Claude Code with the same wrapper and a precise diff-aware prompt. If it needs functional revision, Codex may make that fix directly.
@@ -49,7 +61,8 @@ If the wrapper is unavailable, use this command shape and paste the full content
 ```bash
 claude --print \
   --permission-mode acceptEdits \
-  --output-format text \
+  --output-format stream-json \
+  --include-partial-messages \
   --add-dir "$PWD" \
   -- \
   'You are Claude Code running headlessly as a frontend design refinement pass after Codex has implemented the functional UI.
